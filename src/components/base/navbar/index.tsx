@@ -1,3 +1,4 @@
+
 import { Link, useSearchParams } from 'react-router-dom';
 
 const Navbar = () => {

@@ -13,7 +13,7 @@ export type Todo = {
 
 export type TodosContext = {
     todos:Todo[];
-    handleAddToDo:(task:string) => void; // call signature
+    handleAddToDo:(task:string) => void; 
     toggleTodoAsCompleted:(id:string) => void; 
     handleDeleteTodo:(id:string) => void;
 }
