@@ -1,58 +1,111 @@
 import React, { useState } from 'react';
-import { signInWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '../../utils/firebaseConfig';
+import { getAuth, GoogleAuthProvider, signInWithEmailAndPassword, signInWithPopup } from 'firebase/auth';
 import { useNavigate } from 'react-router-dom';
 
-const Login = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
+const Login: React.FC = () => {
+  const auth = getAuth();
+  const navigate = useNavigate();  // Hook to navigate to different routes
+  const [authing, setAuthing] = useState<boolean>(false);
+  const [email, setEmail] = useState<string>('');
+  const [password, setPassword] = useState<string>('');
+  const [error, setError] = useState<string>('');
 
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    try {
-      await signInWithEmailAndPassword(auth, email, password);
-      navigate('/');
-    } catch (err: any) {
-      setError('Invalid email or password.');
-      console.error("Login Error:", err.code, err.message);
-    } finally {
-      setLoading(false);
-    }
+  // Google SignIn handler
+  const signInWithGoogle = async (): Promise<void> => {
+    setAuthing(true);
+    signInWithPopup(auth, new GoogleAuthProvider())
+      .then((response) => {
+        console.log(response.user.uid);
+        navigate('/');  // Navigate to home on successful login
+      })
+      .catch((error) => {
+        console.log(error);
+        setAuthing(false);
+      });
+  };
+
+  // Email and Password SignIn handler
+  const signInWithEmail = async (): Promise<void> => {
+    setAuthing(true);
+    setError('');  // Clear any previous errors
+
+    signInWithEmailAndPassword(auth, email, password)
+      .then((response) => {
+        console.log(response.user.uid);
+        navigate('/');  // Navigate to home on successful login
+      })
+      .catch((error) => {
+        console.log(error);
+        setError(error.message);  // Set the error message from Firebase
+        setAuthing(false);
+      });
+  };
+
+  // Navigate to sign-up page
+  const navigateToSignUp = () => {
+    navigate('/signup');  // Ensure this is the correct path for your SignUp page
   };
 
   return (
-    <div className='mx-auto max-w-md bg-white rounded-xl p-10 border border-gray-300 shadow-lg'>
-      <h2 className='text-xl font-semibold text-center mb-6'>Login</h2>
-      <form onSubmit={handleLogin} className='space-y-4'>
-        <input
-          className='w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500'
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="Email"
-          required
-        />
-        <input
-          className='w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500'
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          placeholder="Password"
-          required
-        />
-        <button 
-          disabled={loading}
-          className='w-full py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 focus:outline-none'
-          type="submit"
-        >
-          {loading ? 'Logging in...' : 'Login'}
-        </button>
-      </form>
-      {error && <p className="text-red-500 text-center mt-2">{error}</p>}
+    <div className='w-full h-screen flex'>
+      <div className='w-1/2 h-full flex flex-col bg-[#28c34] items-center justify-center'>
+      </div>
+      <div className='w-1/2 h-full bg-[#1a1a1a] flex flex-col p-20 justify-center'>
+        <div className='w-full flex flex-col max-w-[450px] mx-auto'>
+          <div className='w-full flex flex-col mb-10 text-white'>
+            <h3 className='text-4xl font-bold mb-2'>Login</h3>
+            <p className='text-lg mb-4'>Welcome back! Please enter your details</p>
+          </div>
+          <div className='w-full flex flex-col mb-6'>
+            <input
+              type="email"
+              placeholder="Email"
+              className='w-full text-white py-2 mb-4 bg-transparent border-b border-gray-500 focus:outline'
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+            <input
+              type="password"
+              placeholder='Password'
+              className='w-full text-white py-2 mb-4 bg-transparent border-b border-gray-500 focus:outline'
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+          </div>
+          <div className='w-full flex flex-col mb-4'>
+            <button
+              className='w-full bg-transparent border border-white text-white my-2 font-semibold rounded-md'
+              onClick={signInWithEmail}
+              disabled={authing}
+            >
+              Log In With Email and Password
+            </button>
+          </div>
+          {error && <div className='text-red-500 mb-4'>{error}</div>}
+          <div className='w-full flex items-center justify-center relative py-4'>
+            <div className='w-full h-[1px] bg-gray-500'></div>
+            <p className='text-lg absolute text-gray-500 bg-[#1a1a1a] px-2'>OR</p>
+          </div>
+          <button
+            className='w-full bg-white text-black font-semibold rounded-md p-4 text-center flex items-center'
+            onClick={signInWithGoogle}
+            disabled={authing}
+          >
+            Log In With Google
+          </button>
+        </div>
+        <div className='w-full flex items-center justify-center mt-10'>
+          <p className='text-sm font-normal text-gray-400'>
+            Don't have an account?
+            <span
+              className='font-semibold text-white cursor-pointer'
+              onClick={navigateToSignUp}  // Trigger navigation to sign-up page
+            >
+              Sign Up
+            </span>
+          </p>
+        </div>
+      </div>
     </div>
   );
 };

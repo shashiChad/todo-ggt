@@ -6,9 +6,9 @@ import './index.css';
 import { TodosProvider } from './components/custom/todos';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './components/contexts/AuthContext';
-import Login from './components/auth/Login/index';
+import Login from './components/auth/Login';
 import Logout from './components/auth/Logout/index';
-
+import SignUp from './components/auth/SignUp.tsx';
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { user, loading } = useAuth();
 
@@ -27,6 +27,7 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
             <Route path="/" element={<ProtectedRoute><App /></ProtectedRoute>} />
             <Route path="/login" element={<Login />} />
             <Route path="/logout" element={<Logout />} />
+            <Route path="/signup" element={<SignUp/>} />
             <Route path="*" element={<Navigate to="/" />} />
           </Routes>
         </TodosProvider>
@@ -34,3 +35,4 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
     </AuthProvider>
   </React.StrictMode>
 );
+ 

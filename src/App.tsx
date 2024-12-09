@@ -5,9 +5,7 @@ import Todos from './components/base/todos';
 import Logout from './components/auth/Logout';
 import { useAuth } from './components/contexts/AuthContext';
 import './App.css';
-import Register from './components/auth/Register';
 import { Route, Routes, Navigate } from 'react-router-dom';
-import Login from './components/auth/Login';
 
 const App = () => {
   const { user } = useAuth();
@@ -24,15 +22,14 @@ const App = () => {
           <AddToDo />
           <Todos />
           <Logout />
-          <Login/>
-          <Register/>
+          
         </>
       ) : (
-        <Routes>
-          
-          <Route path="/register" element={<Register />} />
-          <Route path="*" element={<Navigate to="/register" />} />
-        </Routes>
+        
+      <Routes>
+       <Route path="*" element={<Navigate to="/login" />} />
+      </Routes>
+    
       )}
     </main>
   );
